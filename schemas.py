@@ -12,7 +12,7 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 # Example schemas (replace with your own):
 
@@ -37,6 +37,21 @@ class Product(BaseModel):
     price: float = Field(..., ge=0, description="Price in dollars")
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
+
+# Translation job schema for persistence
+class TranslationOutput(BaseModel):
+    language: str = Field(..., description="Target language code, e.g., hi, te, kn")
+    translated_text: str = Field(..., description="Translated text content")
+    audio_path: str = Field(..., description="Relative path to generated audio file")
+    text_path: Optional[str] = Field(None, description="Relative path to translated text file")
+
+class TranslationJob(BaseModel):
+    job_name: Optional[str] = Field(None, description="Optional job label from user")
+    source_filename: str = Field(..., description="Original uploaded filename")
+    source_language: str = Field("en", description="ISO code of source language")
+    status: str = Field("completed", description="Processing status")
+    outputs: List[TranslationOutput] = Field(default_factory=list)
+    error: Optional[str] = Field(None, description="Error message if any")
 
 # Add your own schemas here:
 # --------------------------------------------------
